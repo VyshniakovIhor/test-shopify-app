@@ -2,6 +2,7 @@ import {defer} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, Link} from '@remix-run/react';
 import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
+import {CollectionsGrid} from './($locale).collections._index';
 
 /**
  * @type {MetaFunction}
@@ -16,19 +17,25 @@ export const meta = () => {
 export async function loader({context}) {
   const {storefront} = context;
   const {collections} = await storefront.query(FEATURED_COLLECTION_QUERY);
+  const {
+    collections: {nodes: homeCollections},
+  } = await storefront.query(HOME_COLLECTION_QUERY);
   const featuredCollection = collections.nodes[0];
   const recommendedProducts = storefront.query(RECOMMENDED_PRODUCTS_QUERY);
 
-  return defer({featuredCollection, recommendedProducts});
+  return defer({homeCollections, featuredCollection, recommendedProducts});
 }
 
 export default function Homepage() {
   /** @type {LoaderReturnData} */
-  const data = useLoaderData();
+  const {homeCollections, featuredCollection, recommendedProducts} =
+    useLoaderData();
+
   return (
     <div className="home">
-      <FeaturedCollection collection={data.featuredCollection} />
-      <RecommendedProducts products={data.recommendedProducts} />
+      <CollectionsGrid collections={homeCollections} />
+      <FeaturedCollection collection={featuredCollection} />
+      <RecommendedProducts products={recommendedProducts} />
     </div>
   );
 }
@@ -94,6 +101,26 @@ function RecommendedProducts({products}) {
     </div>
   );
 }
+
+const HOME_COLLECTION_QUERY = `#graphql
+  fragment HomeCollection on Collection {
+    id
+    handle
+    title
+    description
+    image {
+      id
+      url
+    }
+  }
+  query Collection {
+    collections(first: 4) {
+      nodes {
+        ...HomeCollection
+      }
+    }
+  }
+`;
 
 const FEATURED_COLLECTION_QUERY = `#graphql
   fragment FeaturedCollection on Collection {
