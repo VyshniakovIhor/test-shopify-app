@@ -299,8 +299,6 @@ aside li {
   gap: 1rem;
 }
 
-
-
 /*
 * --------------------------------------------------
 * routes/__index
@@ -465,4 +463,8 @@ aside li {
 
 .account-logout {
   display: inline-block;
+}
+
+.custom-shop-pay {
+  margin: 20px 0;
 }

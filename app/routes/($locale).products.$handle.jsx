@@ -8,6 +8,7 @@ import {
   VariantSelector,
   getSelectedProductOptions,
   CartForm,
+  ShopPayButton,
 } from '@shopify/hydrogen';
 import {getVariantUrl} from '~/lib/variants';
 
@@ -248,6 +249,11 @@ function ProductForm({product, selectedVariant, variants}) {
       >
         {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
       </AddToCartButton>
+      <ShopPayButton
+        className="custom-shop-pay"
+        variantIds={[selectedVariant.id]}
+        storeDomain={'http://notarealshop.myshopify.com'}
+      />
     </div>
   );
 }
