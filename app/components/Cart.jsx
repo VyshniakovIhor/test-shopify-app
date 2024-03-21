@@ -1,6 +1,7 @@
 import {CartForm, Image, Money} from '@shopify/hydrogen';
 import {Link} from '@remix-run/react';
 import {useVariantUrl} from '~/lib/variants';
+import {useState} from 'react';
 
 /**
  * @param {CartMainProps}
@@ -178,37 +179,60 @@ function CartLineRemoveButton({lineIds}) {
  * @param {{line: CartLine}}
  */
 function CartLineQuantity({line}) {
+  const [myQuantity, setMyQuantity] = useState(line.quantity);
+  const handleQuantityChange = (event) => {
+    const newQuantity = parseInt(event.target.value, 10);
+    setMyQuantity(newQuantity);
+  };
+
   if (!line || typeof line?.quantity === 'undefined') return null;
   const {id: lineId, quantity} = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="cart-line-quantity">
-      <small>Quantity: {quantity} &nbsp;&nbsp;</small>
-      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
-        <button
-          aria-label="Decrease quantity"
-          disabled={quantity <= 1}
-          name="decrease-quantity"
-          value={prevQuantity}
-        >
-          <span>&#8722; </span>
+    <>
+      <div className="cart-line-quantity">
+        <small>Quantity: {quantity} &nbsp;&nbsp;</small>
+        <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
+          <button
+            aria-label="Decrease quantity"
+            disabled={quantity <= 1}
+            name="decrease-quantity"
+            value={prevQuantity}
+          >
+            <span>&#8722; </span>
+          </button>
+        </CartLineUpdateButton>
+        &nbsp;
+        <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
+          <button
+            aria-label="Increase quantity"
+            name="increase-quantity"
+            value={nextQuantity}
+          >
+            <span>&#43;</span>
+          </button>
+        </CartLineUpdateButton>
+        &nbsp;
+        <CartLineRemoveButton lineIds={[lineId]} />
+      </div>
+      <CartLineUpdateButton lines={[{id: line.id, quantity: myQuantity}]}>
+        <input
+          id={`${lineId}-quantity`}
+          name={`${lineId}-quantity`}
+          type="number"
+          value={myQuantity}
+          onChange={handleQuantityChange}
+          min={1}
+          max={100} // Adjust the maximum quantity allowed
+        />
+        <br />
+        <button type="submit" aria-label="Update Quantity">
+          Update
         </button>
       </CartLineUpdateButton>
-      &nbsp;
-      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
-        <button
-          aria-label="Increase quantity"
-          name="increase-quantity"
-          value={nextQuantity}
-        >
-          <span>&#43;</span>
-        </button>
-      </CartLineUpdateButton>
-      &nbsp;
-      <CartLineRemoveButton lineIds={[lineId]} />
-    </div>
+    </>
   );
 }
 
