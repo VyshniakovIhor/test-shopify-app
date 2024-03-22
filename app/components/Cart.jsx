@@ -27,14 +27,38 @@ export function CartMain({layout, cart}) {
 function CartDetails({layout, cart}) {
   const cartHasItems = !!cart && cart.totalQuantity > 0;
 
+  const getIdFromArray = (array) => {
+    return array.reduce(
+      (stack, current) => [
+        ...stack,
+        {
+          id: current.id,
+          quantity: 1,
+        },
+      ],
+      [],
+    );
+  };
+
   return (
     <div className="cart-details">
       <CartLines lines={cart?.lines} layout={layout} />
       {cartHasItems && (
-        <CartSummary cost={cart.cost} layout={layout}>
-          <CartDiscounts discountCodes={cart.discountCodes} />
-          <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
-        </CartSummary>
+        <>
+          <CartSummary cost={cart.cost} layout={layout}>
+            <CartDiscounts discountCodes={cart.discountCodes} />
+            <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
+          </CartSummary>
+          <CartForm
+            route="/cart"
+            action={CartForm.ACTIONS.LinesUpdate}
+            inputs={{
+              lines: getIdFromArray(cart.lines.nodes),
+            }}
+          >
+            <button type="submit">Refresh Cart</button>
+          </CartForm>
+        </>
       )}
     </div>
   );
