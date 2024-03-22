@@ -199,14 +199,39 @@ function CartLineRemoveButton({lineIds}) {
   );
 }
 
+const MAX_QUANTITY = 10; // Example: Set a maximum quantity of 10 for each item
+
 /**
  * @param {{line: CartLine}}
  */
 function CartLineQuantity({line}) {
   const [myQuantity, setMyQuantity] = useState(line.quantity);
-  const handleQuantityChange = (event) => {
+  const handleQuantityChange = async (event) => {
     const newQuantity = parseInt(event.target.value, 10);
+
+    // Check if the new quantity is within the allowed range
+    if (newQuantity < 1 || newQuantity > MAX_QUANTITY) {
+      // Display an error message to the user
+      alert(`Quantity must be between 1 and ${MAX_QUANTITY}.`);
+      return;
+    }
+
     setMyQuantity(newQuantity);
+
+    try {
+      // Call the backend API to update the cart with the new quantity
+      await CartForm.ACTIONS.LinesRemove({
+        lines: [
+          {
+            id: line.id,
+            quantity: newQuantity,
+          },
+        ],
+      });
+    } catch (error) {
+      // Handle any errors, e.g., display an error message to the user
+      console.error('Error updating quantity:', error);
+    }
   };
 
   if (!line || typeof line?.quantity === 'undefined') return null;
