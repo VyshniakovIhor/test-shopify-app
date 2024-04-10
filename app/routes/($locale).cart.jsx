@@ -1,4 +1,4 @@
-import {Await} from '@remix-run/react';
+import {Await, useRouteError} from '@remix-run/react';
 import {Suspense} from 'react';
 import {CartForm} from '@shopify/hydrogen';
 import {json} from '@shopify/remix-oxygen';
@@ -92,17 +92,42 @@ export default function Cart() {
   return (
     <div className="cart">
       <h1>Cart</h1>
-      <Suspense fallback={<p>Loading cart ...</p>}>
-        <Await
-          resolve={cartPromise}
-          errorElement={<div>An error occurred</div>}
-        >
-          {(cart) => {
-            return <CartMain layout="page" cart={cart} />;
-          }}
-        </Await>
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={<p>Loading cart ...</p>}>
+          <Await
+            // resolve={cartPromise}
+            resolve={Promise.reject(new Error('fail'))}
+            errorElement={<div>An error occurred</div>}
+          >
+            {(cart) => {
+              return <CartMain layout="page" cart={cart} />;
+            }}
+          </Await>
+        </Suspense>
+      </ErrorBoundary>
     </div>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  console.error(error);
+  return (
+    <html lang="en">
+      <head>
+        <title>Oh no!</title>
+      </head>
+      <body style={{alignItems: 'center'}}>
+        {/* add the UI you want your users to see */}
+        <img
+          // src="https://media.tenor.com/X0MEYkfcPAMAAAAi/dance-gif-sofia-alengoz-gif.gif"
+          src="dancing.gif"
+          alt=""
+          style={{width: 300}}
+        />
+        <h3>Something is broken :(</h3>
+      </body>
+    </html>
   );
 }
 
