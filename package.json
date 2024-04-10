@@ -10,7 +10,8 @@
     "preview": "npm run build && shopify hydrogen preview",
     "lint": "eslint --no-error-on-unmatched-pattern --ext .js,.ts,.jsx,.tsx .",
     "codegen": "shopify hydrogen codegen",
-    "deploy": "npx shopify hydrogen deploy"
+    "deploy": "npx shopify hydrogen deploy",
+    "useStorefrontData": "npx shopify hydrogen env pull"
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {
